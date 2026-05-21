@@ -1,4 +1,7 @@
 node_modules/
 .env
-ignore
-frontend
+ignore/
+frontend/
+constants/
+client/
+server/
