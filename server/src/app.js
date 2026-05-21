@@ -1,5 +1,6 @@
-const express = require("express");
-const cors = require("cors");
+import express from "express";
+import cors from "cors";
+import vehicleRoutes from "./routes/vehicle.route.js";
 
 const app = express();
 
@@ -18,4 +19,7 @@ app.get("/contact", (req, res) => {
   res.send("This is contact us page");
 });
 
-module.exports = app;
+
+app.use("/api/vehicles", vehicleRoutes);
+
+export default app;
