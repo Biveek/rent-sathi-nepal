@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
-import vehicleRoutes from "./routes/vehicle.route.js";
+import listingRoutes from "./routes/listing.route.js";
+import authRouter from "./routes/auth.route.js";
+import bookingRoute from "./routes/booking.route.js";
 
 const app = express();
 
@@ -20,6 +22,8 @@ app.get("/contact", (req, res) => {
 });
 
 
-app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/listings",listingRoutes);
+app.use("/api/bookings", bookingRoute);
+app.use("/api/auth",authRouter);
 
 export default app;
