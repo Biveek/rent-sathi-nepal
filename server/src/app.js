@@ -1,8 +1,11 @@
 import express from "express";
 import cors from "cors";
+
+
 import listingRoutes from "./routes/listing.route.js";
 import authRouter from "./routes/auth.route.js";
 import bookingRoute from "./routes/booking.route.js";
+import verificationRouter from "./routes/verification.route.js";
 
 const app = express();
 
@@ -25,5 +28,6 @@ app.get("/contact", (req, res) => {
 app.use("/api/listings",listingRoutes);
 app.use("/api/bookings", bookingRoute);
 app.use("/api/auth",authRouter);
+app.use("/api/verify",verificationRouter);
 
 export default app;
