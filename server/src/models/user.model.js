@@ -24,7 +24,8 @@ const userSchema = new mongoose.Schema({
 
     role:{
         type:String,
-        enum:['user','owner','admin']
+        enum:['CUSTOMER','OWNER','ADMIN'],
+        default:"CUSTOMER"
     },
     is_verified_owner:{
         type:Boolean,

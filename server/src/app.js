@@ -3,11 +3,15 @@ import cors from "cors";
 import listingRoutes from "./routes/listing.route.js";
 import authRouter from "./routes/auth.route.js";
 import bookingRoute from "./routes/booking.route.js";
+import reviewRouter from "./routes/review.route.js";
+import logger from "./middlewares/logger.js";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+app.use(logger);
 
 app.get("/", (req, res) => {
   res.send("Rent Sathi Nepal API Running");
@@ -22,8 +26,9 @@ app.get("/contact", (req, res) => {
 });
 
 
-app.use("/api/listings",listingRoutes);
+app.use("/api/listings", listingRoutes);
 app.use("/api/bookings", bookingRoute);
-app.use("/api/auth",authRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/reviews", reviewRouter)
 
 export default app;
