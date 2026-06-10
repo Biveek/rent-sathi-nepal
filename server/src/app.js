@@ -1,5 +1,8 @@
-const express = require("express");
-const cors = require("cors");
+import express from "express";
+import cors from "cors";
+import listingRoutes from "./routes/listing.route.js";
+import authRouter from "./routes/auth.route.js";
+import bookingRoute from "./routes/booking.route.js";
 
 const app = express();
 
@@ -18,4 +21,9 @@ app.get("/contact", (req, res) => {
   res.send("This is contact us page");
 });
 
-module.exports = app;
+
+app.use("/api/listings",listingRoutes);
+app.use("/api/bookings", bookingRoute);
+app.use("/api/auth",authRouter);
+
+export default app;
