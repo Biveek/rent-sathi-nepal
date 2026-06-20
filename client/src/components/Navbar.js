@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { HOME_ROUTE, navMenu } from "@/constants/routes";
+import { HOME_ROUTE, LOGIN_ROUTE, navMenu, REGISTER_ROUTE } from "@/constants/routes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import logo from "@/assets/images/logo.png";
@@ -40,19 +40,19 @@ const Navbar = () => {
         </ul>
 
         <div className="flex gap-2 mx-1">
-          <button
-            type="button"
+          <Link
+            href={LOGIN_ROUTE}
             className="bg-grey-300 text-sm hover:bg-gray-500 p-3 rounded-lg"
           >
             Sign In
-          </button>
+          </Link>
 
-          <button
-            type="button"
+          <Link
+            href={REGISTER_ROUTE}
             className="bg-orange-500 text-white border border-gray-300  text-sm hover:bg-orange-300  p-3 rounded-lg"
           >
             Register
-          </button>
+          </Link>
         </div>
       </nav>
     </header>

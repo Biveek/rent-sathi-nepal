@@ -3,6 +3,9 @@ export const ROOMS_ROUTE="/rooms";
 export const VEHICLES_ROUTE="/vehicles";
 export const SERVICES_ROUTE="/services";
 export const CONTACT_ROUTE="/contact";
+export const LOGIN_ROUTE="/login";
+export const REGISTER_ROUTE="/register";
+
 
 export const navMenu = [
     {
@@ -10,19 +13,19 @@ export const navMenu = [
         route:HOME_ROUTE,
     },
     {
-        label: "rooms",
+        label: "Rooms",
         route:ROOMS_ROUTE,
     },
     {
-        label: "vehicles",
+        label: "Vehicles",
         route:VEHICLES_ROUTE,
     },
     {
-        label: "services",
+        label: "Services",
         route:SERVICES_ROUTE,
     },
     {
-        label: "contact",
+        label: "Contact",
         route:CONTACT_ROUTE,
     },
 ]
