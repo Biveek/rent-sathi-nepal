@@ -7,7 +7,6 @@ import {
   PAYMENT_STATUS_PENDING,
   PAYMENT_STATUS_SUCCESS,
 } from "../constants/payment.js";
-import { Timestamp } from "mongodb";
 
 const paymentSchema = new mongoose.Schema({
   transactionId: {
@@ -15,7 +14,7 @@ const paymentSchema = new mongoose.Schema({
     default: "",
   },
   amount: {
-    type: number,
+    type: Number,
     required: [true, "Amount is required"],
   },
   booking_id: {
@@ -24,7 +23,7 @@ const paymentSchema = new mongoose.Schema({
     required: true,
   },
   user_id: {
-    type: momgoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
@@ -34,7 +33,7 @@ const paymentSchema = new mongoose.Schema({
     required: true,
   },
   status: {
-    type: string,
+    type: String,
     default: PAYMENT_STATUS_PENDING,
     enum: [
       PAYMENT_STATUS_PENDING,
@@ -44,3 +43,6 @@ const paymentSchema = new mongoose.Schema({
   },
 
 },{timestamps:true});
+
+
+export default mongoose.model("Payment",paymentSchema);
