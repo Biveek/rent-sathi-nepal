@@ -7,10 +7,12 @@ import {
   payAdvance,
   updateBookingStatus,
 } from "../controllers/booking.controller.js";
+import validate from "../middlewares/validate.js";
+import { createBookingSchema } from "../utils/validators.js";
 
 const bookingRouter = express.Router();
 
-bookingRouter.post("/", protect, createBooking);
+bookingRouter.post("/", protect,validate(createBookingSchema), createBooking);
 bookingRouter.get("/my", protect, getMyBookings);
 bookingRouter.get("/owner", protect, getOwnerBooking);
 

@@ -1,13 +1,17 @@
 import express from "express";
 import cors from "cors";
+
+
 import listingRoutes from "./routes/listing.route.js";
 import authRouter from "./routes/auth.route.js";
 import bookingRoute from "./routes/booking.route.js";
+
 import reviewRoute from "./routes/review.route.js";
 import logger from "./middlewares/logger.js";
 import userRoute from "./routes/user.route.js";
 import bodyParser from "body-parser";
 import { admminOnly, protect } from "./middlewares/authMiddleware.js";
+import verificationRouter from "./routes/verification.route.js";
 
 const app = express();
 
@@ -32,9 +36,12 @@ app.get("/contact", (req, res) => {
 app.use("/api/users",protect, admminOnly, userRoute);
 app.use("/api/listings", listingRoutes);
 app.use("/api/bookings", bookingRoute);
+
 app.use("/api/auth", authRouter);
+
 app.use("/api/reviews", reviewRoute);
 
+app.use("/api/verify",verificationRouter);
 
 
 export default app;
