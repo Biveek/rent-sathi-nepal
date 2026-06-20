@@ -11,18 +11,18 @@ import {
 } from "../controllers/review.controller.js";
 import { protect, admminOnly } from "../middlewares/authMiddleware.js";
 
-const reviewRouter = express.Router();
+const reviewRoute = express.Router();
 
 // User routes
-reviewRouter.post("/", protect, createReview);
-reviewRouter.get("/my", protect, getMyReviews);
-reviewRouter.get("/rental/:rentalId", getRentalReviews); // public
-reviewRouter.put("/:id", protect, updateReview);
-reviewRouter.delete("/:id", protect, deleteReview);
+reviewRoute.post("/", protect, createReview);
+reviewRoute.get("/my", protect, getMyReviews);
+reviewRoute.get("/rental/:rentalId", getRentalReviews); // public
+reviewRoute.put("/:id", protect, updateReview);
+reviewRoute.delete("/:id", protect, deleteReview);
 
 // Admin routes
-reviewRouter.get("/admin/all", protect, admminOnly, getAllReviewsAdmin);
-reviewRouter.patch("/admin/:id/hide", protect, admminOnly, adminDeleteReview);
-reviewRouter.patch("/admin/:id/restore", protect, admminOnly, adminRestoreReview);
+reviewRoute.get("/admin/all", protect, admminOnly, getAllReviewsAdmin);
+reviewRoute.patch("/admin/:id/hide", protect, admminOnly, adminDeleteReview);
+reviewRoute.patch("/admin/:id/restore", protect, admminOnly, adminRestoreReview);
 
-export default reviewRouter;
+export default reviewRoute;
