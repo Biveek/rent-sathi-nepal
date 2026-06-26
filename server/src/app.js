@@ -12,6 +12,7 @@ import userRoute from "./routes/user.route.js";
 import bodyParser from "body-parser";
 import { admminOnly, protect } from "./middlewares/authMiddleware.js";
 import verificationRouter from "./routes/verification.route.js";
+import messageRouter from "./routes/message.route.js";
 
 const app = express();
 
@@ -25,14 +26,6 @@ app.get("/", (req, res) => {
   res.send("Rent Sathi Nepal API Running");
 });
 
-app.get("/homepage", (req, res) => {
-  res.send("This is homepage");
-});
-
-app.get("/contact", (req, res) => {
-  res.send("This is contact us page");
-});
-
 app.use("/api/users",protect, admminOnly, userRoute);
 app.use("/api/listings", listingRoutes);
 app.use("/api/bookings", bookingRoute);
@@ -43,5 +36,6 @@ app.use("/api/reviews", reviewRoute);
 
 app.use("/api/verify",verificationRouter);
 
+app.use("/api/,messages", protect, messageRouter);
 
 export default app;
