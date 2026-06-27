@@ -40,3 +40,41 @@ export const payViaCash = async (req, res) => {
     res.status(err.status || 500).json({ message: err.message });
   }
 };
+
+export const confirmPayment = async (req, res) => {
+  try {
+    const { payment_id, success } = req.body;
+
+    if (!payment_id) {
+      return res.status(400).json({ message: "Payment ID is required" });
+    }
+
+    const payment = await Payment.findById(payment_id);
+    if (!payment) {
+      return res.status(404).json({ message: "Payment not found" });
+    }
+
+    if (payment.status === PAYMENT_STATUS_SUCCESS) {
+      return res.status(400).json({ message: "Payment already confirmed" });
+    }
+    if (!success) {
+      payment.status = PAYMENT_STATUS_FAILED;
+      await payment.save();
+      return res.status(400).json({ message: "Payment failed" });
+    }
+
+    payment.status = PAYMENT_STATUS_SUCCESS;
+    await payment.save();
+
+    await Booking.findByIdAndUpdate(payment.booking_id, { status: "confirmed" });
+
+    res.json({
+      success: true,
+      message: "Payment confirmed. Booking confirmed!",
+      data: payment,
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
