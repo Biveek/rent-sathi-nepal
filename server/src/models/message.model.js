@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
  const messageSchema = new mongoose.Schema({
     sender_id:{
@@ -24,6 +24,7 @@ import mongoose from "mongoose"
         type:Boolean,
         default:false
     },
- },{timestamps:true})
+ },{timestamps:true});
+
  export default mongoose.model("Message",messageSchema);
  

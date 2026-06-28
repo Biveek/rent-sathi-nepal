@@ -1,4 +1,5 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
+import { ROLE_CUSTOMER, ROLE_OWNER, ROLE_ADMIN, ROLE_SUPER_ADMIN } from "../constants/roles.js";
 
 const userSchema = new mongoose.Schema({
     name:{
@@ -24,7 +25,8 @@ const userSchema = new mongoose.Schema({
 
     role:{
         type:String,
-        enum:['user','owner','admin']
+        enum:[ROLE_CUSTOMER, ROLE_OWNER, ROLE_ADMIN, ROLE_SUPER_ADMIN],
+        default:ROLE_CUSTOMER
     },
     is_verified_owner:{
         type:Boolean,
@@ -39,5 +41,5 @@ const userSchema = new mongoose.Schema({
         default:''
     },
 },{timestamps:true});
-const User = mongoose.model("User",userSchema);
-export default User;
+
+export default mongoose.model("User",userSchema);
