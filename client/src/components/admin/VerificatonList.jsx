@@ -1,5 +1,7 @@
+"use client"
+
 import { useEffect, useState } from "react";
-import { getAllVerifications, decideVerification } from "../../api/admin.js";
+import { getAllVerifications, decideVerification } from "@/api/admin";
 
 export default function VerificationsList() {
   const [verifications, setVerifications] = useState([]);
@@ -39,7 +41,10 @@ export default function VerificationsList() {
     try {
       await decideVerification(id, "reject", reason);
       setVerifications(prev =>
-        prev.map(v => v._id === id ? { ...v, status: "rejected", rejection_reason: reason } : v)
+        prev.map(v => v._id === id
+          ? { ...v, status: "rejected", rejection_reason: reason }
+          : v
+        )
       );
       setRejectId(null);
       setReason("");
@@ -50,133 +55,90 @@ export default function VerificationsList() {
     }
   };
 
-  if (loading) return <p style={{ color: "#6b6560" }}>Loading verifications...</p>;
-  if (error)   return <p style={{ color: "red" }}>{error}</p>;
+  if (loading) return <p className="text-gray-500">Loading verifications...</p>;
+  if (error)   return <p className="text-red-500">{error}</p>;
   if (verifications.length === 0)
-    return <p style={{ color: "#6b6560" }}>No verifications found.</p>;
+    return <p className="text-gray-500">No verifications found.</p>;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <div className="flex flex-col gap-4">
       {verifications.map(v => (
-        <div key={v._id} style={{
-          background: "#fff",
-          border: `1px solid ${v.status === "approved" ? "#6ee7b7" : v.status === "rejected" ? "#fca5a5" : "#e5e2df"}`,
-          borderRadius: 10,
-          padding: "1.25rem",
-          opacity: v.status !== "pending" ? 0.7 : 1,
-        }}>
+        <div key={v._id} className={`bg-white rounded-xl p-5 border transition-opacity ${
+          v.status === "approved" ? "border-green-200" :
+          v.status === "rejected" ? "border-red-200 opacity-60" :
+          "border-gray-200"
+        }`}>
 
-          {/* Header */}
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
+          <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: "50%",
-                  background: "#fdf0e8", color: "#d4622a",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "0.7rem", fontWeight: 700,
-                }}>
+              {/* Name + status */}
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold">
                   {v.user_id?.name?.slice(0, 2).toUpperCase()}
                 </div>
-                <span style={{ fontWeight: 600, fontSize: "0.95rem" }}>
-                  {v.user_id?.name}
-                </span>
+                <span className="font-semibold text-sm">{v.user_id?.name}</span>
                 <StatusBadge status={v.status} />
               </div>
 
-              {/* Meta */}
-              <div style={{ display: "flex", gap: "1.25rem", flexWrap: "wrap" }}>
-                {[
-                  { label: v.user_id?.email },
-                  { label: v.phone },
-                  { label: v.address },
-                  { label: `Applied ${new Date(v.createdAt).toLocaleDateString()}` },
-                ].map((m, i) => (
-                  <span key={i} style={{ fontSize: "0.8rem", color: "#6b6560" }}>
-                    {m.label}
-                  </span>
-                ))}
+              {/* Meta info */}
+              <div className="flex flex-wrap gap-4 text-xs text-gray-500">
+                <span>{v.user_id?.email}</span>
+                <span>{v.phone}</span>
+                <span>{v.address}</span>
+                <span>Applied {new Date(v.createdAt).toLocaleDateString()}</span>
               </div>
 
               {/* Citizenship image */}
               {v.citizenship_img && (
-                <div style={{ marginTop: 10 }}>
-                  <p style={{ fontSize: "0.75rem", color: "#6b6560", marginBottom: 4 }}>
-                    Citizenship photo:
-                  </p>
+                <div className="mt-3">
+                  <p className="text-xs text-gray-400 mb-1">Citizenship photo:</p>
                   <img
                     src={v.citizenship_img}
                     alt="citizenship"
                     onClick={() => window.open(v.citizenship_img, "_blank")}
-                    style={{
-                      width: 160, height: 100, objectFit: "cover",
-                      borderRadius: 6, border: "1px solid #e5e2df",
-                      cursor: "pointer",
-                    }}
+                    className="w-40 h-24 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
                     onError={e => e.target.style.display = "none"}
                   />
                 </div>
               )}
 
-              {/* Rejection reason if rejected */}
+              {/* Rejection reason */}
               {v.status === "rejected" && v.rejection_reason && (
-                <p style={{ marginTop: 8, fontSize: "0.82rem", color: "#b91c1c" }}>
+                <p className="mt-2 text-xs text-red-600">
                   Reason: {v.rejection_reason}
                 </p>
               )}
             </div>
 
-            {/* Action buttons — only show for pending */}
+            {/* Action buttons */}
             {v.status === "pending" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 140 }}>
-
-                {/* Approve */}
+              <div className="flex flex-col gap-2 min-w-36">
                 <button
                   onClick={() => handleApprove(v._id)}
                   disabled={!!actionLoading}
-                  style={{
-                    padding: "0.55rem 1rem",
-                    background: actionLoading === v._id ? "#e5e2df" : "#166534",
-                    color: "#fff", border: "none", borderRadius: 6,
-                    fontSize: "0.84rem", fontWeight: 600, cursor: "pointer",
-                  }}
+                  className="px-4 py-2 bg-green-700 text-white text-sm font-semibold rounded-lg hover:bg-green-800 disabled:opacity-50 transition-colors"
                 >
                   {actionLoading === v._id ? "..." : "✓ Approve"}
                 </button>
 
-                {/* Reject toggle */}
                 {rejectId === v._id ? (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <div className="flex flex-col gap-2">
                     <input
                       value={reason}
                       onChange={e => setReason(e.target.value)}
                       placeholder="Rejection reason..."
-                      style={{
-                        padding: "0.45rem 0.75rem",
-                        border: "1px solid #e5e2df",
-                        borderRadius: 6, fontSize: "0.82rem",
-                        fontFamily: "DM Sans",
-                      }}
+                      className="px-3 py-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-orange-400"
                     />
                     <button
                       onClick={() => handleReject(v._id)}
                       disabled={!!actionLoading}
-                      style={{
-                        padding: "0.45rem",
-                        background: "#b91c1c", color: "#fff",
-                        border: "none", borderRadius: 6,
-                        fontSize: "0.82rem", fontWeight: 600, cursor: "pointer",
-                      }}
+                      className="px-3 py-2 bg-red-600 text-white text-xs font-semibold rounded-lg hover:bg-red-700 disabled:opacity-50"
                     >
                       Confirm rejection
                     </button>
                     <button
                       onClick={() => { setRejectId(null); setReason(""); }}
-                      style={{
-                        padding: "0.45rem", background: "none",
-                        border: "1px solid #e5e2df", borderRadius: 6,
-                        fontSize: "0.82rem", cursor: "pointer",
-                      }}
+                      className="px-3 py-2 border border-gray-200 text-xs rounded-lg hover:bg-gray-50"
                     >
                       Cancel
                     </button>
@@ -184,12 +146,7 @@ export default function VerificationsList() {
                 ) : (
                   <button
                     onClick={() => setRejectId(v._id)}
-                    style={{
-                      padding: "0.55rem 1rem",
-                      background: "#fff", color: "#b91c1c",
-                      border: "1px solid #fca5a5", borderRadius: 6,
-                      fontSize: "0.84rem", fontWeight: 600, cursor: "pointer",
-                    }}
+                    className="px-4 py-2 border border-red-200 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-50 transition-colors"
                   >
                     ✗ Reject
                   </button>
@@ -205,16 +162,12 @@ export default function VerificationsList() {
 
 function StatusBadge({ status }) {
   const styles = {
-    pending:  { background: "#fef9c3", color: "#854d0e" },
-    approved: { background: "#f0fdf4", color: "#166534" },
-    rejected: { background: "#fef2f2", color: "#b91c1c" },
+    pending:  "bg-yellow-100 text-yellow-800",
+    approved: "bg-green-100 text-green-700",
+    rejected: "bg-red-100 text-red-700",
   };
   return (
-    <span style={{
-      ...styles[status],
-      padding: "2px 10px", borderRadius: 99,
-      fontSize: "0.72rem", fontWeight: 600,
-    }}>
+    <span className={`${styles[status]} text-xs font-semibold px-3 py-1 rounded-full`}>
       {status}
     </span>
   );

@@ -1,5 +1,7 @@
+"use client"
+
 import { useEffect, useState } from "react";
-import { getAllUsers } from "../../api/admin.js";
+import { getAllUsers } from "@/api/admin";
 
 export default function UsersList() {
   const [users,   setUsers]   = useState([]);
@@ -13,66 +15,52 @@ export default function UsersList() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p style={{ color: "#6b6560" }}>Loading users...</p>;
-  if (error)   return <p style={{ color: "red" }}>{error}</p>;
+  if (loading) return <p className="text-gray-500">Loading users...</p>;
+  if (error)   return <p className="text-red-500">{error}</p>;
 
   return (
     <div>
-      <p style={{ fontSize: "0.85rem", color: "#6b6560", marginBottom: "1rem" }}>
-        {users.length} registered users
-      </p>
-
-      <div style={{ background: "#fff", border: "1px solid #e5e2df", borderRadius: 10, overflow: "hidden" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ background: "#faf9f8" }}>
-              {["User", "Phone", "Role", "Verified Owner", "Joined"].map(h => (
-                <th key={h} style={{
-                  padding: "0.65rem 1rem", textAlign: "left",
-                  fontSize: "0.73rem", fontWeight: 600,
-                  textTransform: "uppercase", letterSpacing: "0.07em",
-                  color: "#6b6560", borderBottom: "1px solid #e5e2df"
-                }}>
+      <p className="text-sm text-gray-500 mb-3">{users.length} registered users</p>
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              {["User", "Phone", "Role", "Verified", "Joined"].map(h => (
+                <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-200">
                   {h}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {users.map(u => (
+            {users.map((u, i) => (
               <tr key={u._id}
-                style={{ borderBottom: "1px solid #e5e2df" }}
-                onMouseEnter={e => e.currentTarget.style.background = "#faf9f8"}
-                onMouseLeave={e => e.currentTarget.style.background = "#fff"}
+                className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                  i === users.length - 1 ? "border-0" : ""
+                }`}
               >
-                <td style={{ padding: "0.85rem 1rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <div style={{
-                      width: 32, height: 32, borderRadius: "50%",
-                      background: "#fdf0e8", color: "#d4622a",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: "0.7rem", fontWeight: 700, flexShrink: 0
-                    }}>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
                       {u.name?.slice(0, 2).toUpperCase()}
                     </div>
                     <div>
-                      <div style={{ fontWeight: 500, fontSize: "0.88rem" }}>{u.name}</div>
-                      <div style={{ fontSize: "0.75rem", color: "#6b6560" }}>{u.email}</div>
+                      <div className="font-medium text-sm">{u.name}</div>
+                      <div className="text-xs text-gray-500">{u.email}</div>
                     </div>
                   </div>
                 </td>
-                <td style={{ padding: "0.85rem 1rem", fontSize: "0.86rem" }}>
-                  {u.phone || "—"}
-                </td>
-                <td style={{ padding: "0.85rem 1rem" }}>
+                <td className="px-4 py-3 text-sm text-gray-600">{u.phone || "—"}</td>
+                <td className="px-4 py-3">
                   <RoleBadge role={u.role} />
                 </td>
-                <td style={{ padding: "0.85rem 1rem" }}>
+                <td className="px-4 py-3">
                   {u.is_verified_owner
-                    ? <span style={greenBadge}>✓ Verified</span>
-                    : <span style={grayBadge}>Not verified</span>}
+                    ? <span className="bg-green-50 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">✓ Verified</span>
+                    : <span className="bg-gray-100 text-gray-500 text-xs font-semibold px-3 py-1 rounded-full">Not verified</span>
+                  }
                 </td>
-                <td style={{ padding: "0.85rem 1rem", fontSize: "0.84rem", color: "#6b6560" }}>
+                <td className="px-4 py-3 text-sm text-gray-500">
                   {new Date(u.createdAt).toLocaleDateString()}
                 </td>
               </tr>
@@ -85,29 +73,14 @@ export default function UsersList() {
 }
 
 function RoleBadge({ role }) {
-  const colors = {
-    admin: { background: "#fdf0e8", color: "#d4622a" },
-    owner: { background: "#f0fdf4", color: "#166534" },
-    user:  { background: "#f1f0ee", color: "#44403c" },
+  const styles = {
+    admin: "bg-orange-100 text-orange-700",
+    owner: "bg-green-100 text-green-700",
+    user:  "bg-gray-100 text-gray-600",
   };
   return (
-    <span style={{
-      ...colors[role],
-      padding: "2px 10px", borderRadius: 99,
-      fontSize: "0.75rem", fontWeight: 600,
-    }}>
+    <span className={`${styles[role]} text-xs font-semibold px-3 py-1 rounded-full`}>
       {role}
     </span>
   );
 }
-
-const greenBadge = {
-  background: "#f0fdf4", color: "#166534",
-  padding: "2px 10px", borderRadius: 99,
-  fontSize: "0.75rem", fontWeight: 600,
-};
-const grayBadge = {
-  background: "#f1f0ee", color: "#6b6560",
-  padding: "2px 10px", borderRadius: 99,
-  fontSize: "0.75rem", fontWeight: 600,
-};
