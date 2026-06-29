@@ -1,22 +1,36 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { LOGIN_ROUTE } from "@/constants/routes";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { signup } from "@/api/auth";
+import { useAuth } from "@/context/AuthContext";
 
 const RegisterPage = () => {
+  const router = useRouter();
+  const { signup } = useAuth();
   const { register, handleSubmit } = useForm();
-  function SubmitForm(data) {
-    signup({
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      password: data.password,
-    })
-      .then((res) => console.log(res))
-      .catch((error) => console.log(error));
-  }
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const SubmitForm = async (data) => {
+    setError("");
+    setSubmitting(true);
+
+    try {
+      await signup({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        password: data.password,
+      });
+      router.push("/");
+    } catch (err) {
+      setError(err?.response?.data?.message || err.message || "Registration failed");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
@@ -124,10 +138,12 @@ const RegisterPage = () => {
               </div>
               <button
                 type="submit"
-                className="text-white w-full bg-primary-dark hover:bg-primary focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                disabled={submitting}
+                className="text-white w-full bg-primary-dark hover:bg-primary focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-50"
               >
-                Create an account
+                {submitting ? "Creating account..." : "Create an account"}
               </button>
+              {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Already have an account?{" "}
                 <Link

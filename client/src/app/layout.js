@@ -1,12 +1,16 @@
 import Navbar from "@/components/Navbar";
+import Providers from "./providers";
 import "./globals.css";
 
 const RootLayout = ({ children }) => {
   return (
     <html lang="en">
-      <body >
-      <Navbar />
-        {children}</body>
+      <body>
+        <Providers>
+          <Navbar />
+          {children}
+        </Providers>
+      </body>
     </html>
   );
 };
