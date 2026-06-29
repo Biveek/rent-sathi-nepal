@@ -3,11 +3,16 @@ import User from "../models/user.model.js";
 
 export const applyForOwner = async (req, res) => {
   try {
-    const { full_name, phone, address, citizenship_img, rejection_reason } = req.body;
+    const { full_name, phone, address, citizenship_img } = req.body;
+    const {user_id} = req.user._id;
     if(!full_name || !phone || !address || !citizenship_img){
         return res.status(400).json({message :"please fill all the fields"})
     }
-    const existing = await Verification.findOne({user_id:req.body._id})//check duplicate application from same user
+    const existing = await Verification.findOne({user_id})//check duplicate application from same user
+    console.log(req.user._id);
+    console.log(user_id);
+    
+
     if(existing){
         if(existing.status==='pending'){
             return res.status(400).json({message:"Your application is on pending. Please wait for admin review"})
@@ -22,7 +27,6 @@ export const applyForOwner = async (req, res) => {
             existing.address = address;
             existing.citizenship_img = citizenship_img;
             existing.status = "pending";
-            existing.rejection_reason = rejection_reason;
             await existing.save();
 
             return res.json({
@@ -33,7 +37,7 @@ export const applyForOwner = async (req, res) => {
         }
     }
     const verification  = await Verification.create({
-        user_id:req.body._id,
+        user_id:req.user._id,
         full_name,
         phone,
         address,

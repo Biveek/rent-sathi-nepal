@@ -4,8 +4,9 @@ import "./globals.css";
 const RootLayout = ({ children }) => {
   return (
     <html lang="en">
+      <body >
       <Navbar />
-      <body >{children}</body>
+        {children}</body>
     </html>
   );
 };

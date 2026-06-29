@@ -16,7 +16,14 @@ import messageRouter from "./routes/message.route.js";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:3000",  // ← Next.js
+    "http://localhost:5500",  // ← your HTML files
+    "http://localhost:5173",  // ← Vite if used
+  ],
+  credentials: true,
+}));
 app.use(express.json());
 app.use(bodyParser.json());
 
@@ -36,6 +43,6 @@ app.use("/api/reviews", reviewRoute);
 
 app.use("/api/verify",verificationRouter);
 
-app.use("/api/,messages", protect, messageRouter);
+app.use("/api/messages", protect, messageRouter);
 
 export default app;

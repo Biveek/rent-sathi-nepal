@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { getAllUsers } from "@/api/admin";
+import { getAll } from "@/api/admin";
 
 export default function UsersList() {
   const [users,   setUsers]   = useState([]);
@@ -9,7 +9,7 @@ export default function UsersList() {
   const [error,   setError]   = useState("");
 
   useEffect(() => {
-    getAllUsers()
+    getAll()
       .then(res => setUsers(res.data.data))
       .catch(() => setError("Failed to load users"))
       .finally(() => setLoading(false));
