@@ -1,6 +1,6 @@
 import express from "express";
 import Listing from "../models/listing.model.js";
-import { createDummyListings, createListing, deleteListing, getListingById, getListings } from "../controllers/listing.controller.js";
+import { createDummyListings, createListing, deleteListing, getListingById, getListings,updateListing } from "../controllers/listing.controller.js";
 import { protect } from "../middlewares/authMiddleware.js";
 
 
@@ -12,6 +12,8 @@ listingRoutes.get("/seed",createDummyListings)
 
 // Protected — must be logged in
 listingRoutes.post("/",       protect, createListing);
+listingRoutes.put("/:id",  protect, updateListing);
+
 listingRoutes.delete("/:id",  protect, deleteListing);
 
 // router.get("/debug", async (req, res) => {

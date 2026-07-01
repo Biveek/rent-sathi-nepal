@@ -120,6 +120,9 @@ const createListing = async (req, res) => {
   }
 };
 const updateListing = async (req, res) => {
+
+  const id=req.params.id;
+  const input=req.body;
   try {
     const listing = await Listing.findById(req.params.id);
 
