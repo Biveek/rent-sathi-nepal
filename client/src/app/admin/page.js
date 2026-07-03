@@ -1,13 +1,14 @@
-
-"use client"
+"use client";
 
 import { useState } from "react";
 import UsersList from "@/components/admin/UserList";
 import VerificationsList from "@/components/admin/VerificatonList";
+import AdminListingsPage from "@/components/admin/AdminListingPage";
 
 const tabs = [
-  { id: "users",         label: "All Users" },
+  { id: "users", label: "All Users" },
   { id: "verifications", label: "Verifications" },
+  { id: "listings", label: "Listings" },
 ];
 
 export default function AdminPage() {
@@ -20,7 +21,7 @@ export default function AdminPage() {
 
       {/* Tabs */}
       <div className="flex border-b border-gray-200 mb-6">
-        {tabs.map(tab => (
+        {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -35,9 +36,9 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {/* Content */}
-      {activeTab === "users"         && <UsersList/>}
+      {activeTab === "users" && <UsersList />}
       {activeTab === "verifications" && <VerificationsList />}
+      {activeTab === "listings" && <AdminListingsPage />}
     </div>
   );
 }
