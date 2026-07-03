@@ -29,7 +29,6 @@ const verificationSchema = new mongoose.Schema({
     },
     rejection_reason:{
         type:String,
-        required:true,
         default:''
     },
 },{timestamps:true})
