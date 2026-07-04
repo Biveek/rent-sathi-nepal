@@ -3,37 +3,37 @@ import User from "../models/user.model.js";
 
 export const applyForOwner = async (req, res) => {
   try {
-    const { full_name, phone, address, citizenship_img, rejection_reason } = req.body;
-    if(!full_name || !phone || !address || !citizenship_img){
-        return res.status(400).json({message :"please fill all the fields"})
+    const { full_name, phone, address, citizenship_img } = req.body;
+    const user_id = req.user._id;
+    if (!full_name || !phone || !address || !citizenship_img) {
+      return res.status(400).json({ message: "please fill all the fields" });
     }
-    const existing = await Verification.findOne({user_id:req.body._id})//check duplicate application from same user
-    if(existing){
-        if(existing.status==='pending'){
-            return res.status(400).json({message:"Your application is on pending. Please wait for admin review"})
-        }
-        if(pending.status==="approved"){
-            return res.status(400).json({message:"You are already a verified owner"})
-            
-        }
-        if(existing.status==='rejected'){
-            existing.full_name = full_name;
-            existing.phone = phone;
-            existing.address = address;
-            existing.citizenship_img = citizenship_img;
-            existing.status = "pending";
-            existing.rejection_reason = rejection_reason;
-            await existing.save();
+    const existing = await Verification.findOne({ user_id });
 
-            return res.json({
-                success:true,
-                message:"Reapplication submitted. Waiting for admin review.",
-                data:existing
-            })
-        }
+    if (existing) {
+      if (existing.status === 'pending') {
+        return res.status(400).json({ message: "Your application is on pending. Please wait for admin review" });
+      }
+      if (existing.status === "approved") {
+        return res.status(400).json({ message: "You are already a verified owner" });
+      }
+      if (existing.status === 'rejected' || existing.status === 'reject') {
+        existing.full_name = full_name;
+        existing.phone = phone;
+        existing.address = address;
+        existing.citizenship_img = citizenship_img;
+        existing.status = "pending";
+        await existing.save();
+
+        return res.json({
+          success: true,
+          message: "Reapplication submitted. Waiting for admin review.",
+          data: existing,
+        });
+      }
     }
     const verification  = await Verification.create({
-        user_id:req.body._id,
+        user_id:req.user._id,
         full_name,
         phone,
         address,
@@ -123,16 +123,16 @@ export const decideVerification = async (req, res) => {
 
     const verification = await Verification.findById(req.params.id);
 
-    if(!verification){
-        return res.status(404).json({message:"Verification not found"})
+    if (!verification) {
+      return res.status(404).json({ message: "Verification not found" });
     }
-    if(verification.status === "pending"){
-        return res.status(400).json({message:`The application is already on ${verification.status}. Please wait while admin reviews it`})
+    if (verification.status !== "pending") {
+      return res.status(400).json({ message: `The application is already ${verification.status}. You cannot change it again.` });
     }
 
-    if(action === 'approve'){
-        verification.status = 'approved';
-        await verification.save();
+    if (action === 'approve') {
+      verification.status = 'approved';
+      await verification.save();
 
     await User.findByIdAndUpdate(verification.user_id,{
             role:"owner",
