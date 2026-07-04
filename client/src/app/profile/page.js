@@ -17,13 +17,17 @@ const ProfilePage = () => {
 
   // Fetch user data on page load
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("rentsathi_user") || "null");
+    if (typeof window === "undefined") return;
+    const storedUser = JSON.parse(
+      localStorage.getItem("rentsathi_user") || "null",
+    );
     if (!storedUser?.token) {
       router.push("/login"); // redirect if not logged in
       return;
     }
 
-    api.get("/auth/me")
+    api
+      .get("/auth/me")
       .then((res) => {
         setUser(res.data);
         setValue("name", res.data.name);
@@ -69,10 +73,8 @@ const ProfilePage = () => {
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto">
         <div className="w-full bg-white rounded-lg shadow dark:border sm:max-w-md md:max-w-lg lg:max-w-xl dark:bg-gray-800 dark:border-gray-700">
           <div className="p-4 sm:p-6 md:p-8 space-y-4 md:space-y-6">
-
             {/* Profile Header */}
             <div className="flex flex-col items-center space-y-3">
-
               {/* Profile Photo */}
               <div className="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-4xl">
                 {user?.profile_photo ? (
@@ -113,12 +115,20 @@ const ProfilePage = () => {
             {/* Read Only Info */}
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.email}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Email
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {user?.email}
+                </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Trust Score</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">⭐ {user?.trust_score}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Trust Score
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  ⭐ {user?.trust_score}
+                </p>
               </div>
             </div>
 
@@ -185,7 +195,6 @@ const ProfilePage = () => {
                 {updating ? "Saving..." : "Save Changes"}
               </button>
             </form>
-
           </div>
         </div>
       </div>

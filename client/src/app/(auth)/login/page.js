@@ -43,17 +43,6 @@ const LoginPage = () => {
         );
       }
 
-      // Save user info too (optional but useful)
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          _id: res._id,
-          name: res.name,
-          email: res.email,
-          role: res.role,
-        }),
-      );
-
       // Redirect to home after login
       router.push("/");
     } catch (err) {
