@@ -1,21 +1,51 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { LOGIN_ROUTE } from "@/constants/routes";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { signup } from "@/api/auth";
+import { useRouter } from "next/navigation";
 
 const RegisterPage = () => {
   const { register, handleSubmit } = useForm();
-  function SubmitForm(data) {
-    signup({
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      password: data.password,
-    })
-      .then((res) => console.log(res))
-      .catch((error) => console.log(error));
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  async function SubmitForm(data) {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await signup({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        password: data.password,
+      });
+
+      // Save token if backend returns one on register
+      if (res.token) {
+        localStorage.setItem(
+          "rentsathi_user",
+          JSON.stringify({
+            _id: res._id,
+            name: res.name,
+            email: res.email,
+            role: res.role,
+            token: res.token, // ← token inside the object!
+          }),
+        );
+      }
+
+      // Redirect to login after successful register
+      router.push(LOGIN_ROUTE);
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Registration failed. Try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -26,10 +56,17 @@ const RegisterPage = () => {
             <h1 className="text-xl font-bold text-gray-900 md:text-2xl dark:text-white">
               Create an account
             </h1>
+
+            {/* Error Message */}
+            {error && (
+              <div className="p-3 text-sm text-red-600 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-300">
+                {error}
+              </div>
+            )}
+
             <form
               onSubmit={handleSubmit(SubmitForm)}
               className="space-y-4 md:space-y-6"
-              action="#"
             >
               <div>
                 <label
@@ -47,7 +84,7 @@ const RegisterPage = () => {
                   {...register("name")}
                 />
               </div>
-              <div></div>
+
               <div>
                 <label
                   htmlFor="email"
@@ -64,9 +101,10 @@ const RegisterPage = () => {
                   {...register("email")}
                 />
               </div>
+
               <div>
                 <label
-                  htmlFor="Phone number"
+                  htmlFor="phone"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
                   Phone number
@@ -80,6 +118,7 @@ const RegisterPage = () => {
                   {...register("phone")}
                 />
               </div>
+
               <div>
                 <label
                   htmlFor="password"
@@ -101,7 +140,6 @@ const RegisterPage = () => {
                 <div className="flex items-center h-5">
                   <input
                     id="terms"
-                    aria-describedby="terms"
                     type="checkbox"
                     className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
                     required
@@ -122,12 +160,15 @@ const RegisterPage = () => {
                   </label>
                 </div>
               </div>
+
               <button
                 type="submit"
-                className="text-white w-full bg-primary-dark hover:bg-primary focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                disabled={loading}
+                className="text-white w-full bg-primary-dark hover:bg-primary focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Create an account
+                {loading ? "Creating account..." : "Create an account"}
               </button>
+
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Already have an account?{" "}
                 <Link
