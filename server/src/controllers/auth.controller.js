@@ -80,3 +80,20 @@ export const getMe = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+//update my profile
+export const updateMe = async (req, res) => {
+  try {
+    const { name, phone } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, phone },
+      { new: true }
+    ).select("-password");
+
+    res.json({ success: true, data: user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

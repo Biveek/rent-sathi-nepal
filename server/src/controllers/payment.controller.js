@@ -1,6 +1,11 @@
 import Payment from "../models/payment.model.js";
 import Booking from "../models/booking.model.js";
-import { PAYMENT_STATUS_PENDING, PAYMENT_STATUS_SUCCESS } from "../constants/payment.js";
+import {
+  PAYMENT_STATUS_PENDING,
+  PAYMENT_STATUS_SUCCESS,
+  PAYMENT_METHOD_CASH,
+  PAYMENT_STATUS_FAILED,
+} from "../constants/payment.js";
 
 export const getBookingForPayment = async (bookingId, userId) => {
   const booking = await Booking.findById(bookingId);
@@ -16,16 +21,18 @@ export const getBookingForPayment = async (bookingId, userId) => {
   return booking;
 };
 
-
 export const payViaCash = async (req, res) => {
   try {
-    const booking = await getBookingForPayment(req.params.bookingId, req.user._id);
+    const booking = await getBookingForPayment(
+      req.params.bookingId,
+      req.user._id,
+    );
     const payment = await Payment.create({
-      booking_id:    booking._id,
-      user_id:       req.user._id,
-      method:        PAYMENT_METHOD_CASH,
-      amount:        booking.advance_amount,
-      status:        PAYMENT_STATUS_PENDING, //cash confirmed  by owner later
+      booking_id: booking._id,
+      user_id: req.user._id,
+      method: PAYMENT_METHOD_CASH,
+      amount: booking.advance_amount,
+      status: PAYMENT_STATUS_PENDING, //cash confirmed  by owner later
       transactionId: `CASH-${Date.now()}`,
     });
 
@@ -35,7 +42,6 @@ export const payViaCash = async (req, res) => {
       message: "Cash payment recorded. Owner will confirm on meeting.",
       data: payment,
     });
-
   } catch (err) {
     res.status(err.status || 500).json({ message: err.message });
   }
@@ -66,14 +72,15 @@ export const confirmPayment = async (req, res) => {
     payment.status = PAYMENT_STATUS_SUCCESS;
     await payment.save();
 
-    await Booking.findByIdAndUpdate(payment.booking_id, { status: "confirmed" });
+    await Booking.findByIdAndUpdate(payment.booking_id, {
+      status: "confirmed",
+    });
 
     res.json({
       success: true,
       message: "Payment confirmed. Booking confirmed!",
       data: payment,
     });
-
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

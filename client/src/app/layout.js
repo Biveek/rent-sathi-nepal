@@ -4,10 +4,12 @@ import "./globals.css";
 const RootLayout = ({ children }) => {
   return (
     <html lang="en">
-      <Navbar />
-      <body >{children}</body>
+      <body>
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 };
- 
+
 export default RootLayout;
