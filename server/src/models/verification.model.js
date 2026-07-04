@@ -24,12 +24,11 @@ const verificationSchema = new mongoose.Schema({
     },
     status:{
         type:String,
-        enum:['pending','approved','reject'],
+        enum:['pending','approved','rejected'],
         default:'pending'
     },
     rejection_reason:{
         type:String,
-        required:true,
         default:''
     },
 },{timestamps:true})
