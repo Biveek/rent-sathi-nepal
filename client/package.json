@@ -14,7 +14,8 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-hook-form": "^7.79.0",
-    "zustand": "^5.0.14"
+    "zustand": "^5.0.14",
+    "swiper": "^12.2.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
