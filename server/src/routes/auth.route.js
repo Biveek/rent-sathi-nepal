@@ -3,6 +3,7 @@ import { getMe, login, register, updateMe } from "../controllers/auth.controller
 import { protect } from "../middlewares/authMiddleware.js";
 import validate from "../middlewares/validate.js";
 import { loginSchema, registerSchema } from "../utils/validators.js";
+import upload from "../middlewares/upload.js";
 
 const authRouter = express.Router();
 
@@ -15,6 +16,6 @@ authRouter.post("/login",validate(loginSchema),login);
 //private/protected route token required
 authRouter.get("/me",protect,getMe);
 
-authRouter.put("/me", protect, updateMe);
+authRouter.put("/me", protect, upload.single("profile_photo"), updateMe);
 
 export default authRouter;

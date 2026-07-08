@@ -1,13 +1,10 @@
-import express from "express";
-import dotenv  from "dotenv";
 import connectDB from "./config/db.js";
 import app from "./app.js";
+import "./config/cloudinary.js";
+import config from "./config/config.js";
 
-dotenv.config();
 connectDB();
 
-const PORT = process.env.PORT;
-
-app.listen(PORT,()=>{
-    console.log(`Server running at ${PORT}`)
+app.listen(config.port, () => {
+    console.log(`Server running at ${config.port}`);
 });

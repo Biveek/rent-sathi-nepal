@@ -6,7 +6,7 @@ import bookingRoute from "./routes/booking.route.js";
 import reviewRoute from "./routes/review.route.js";
 import logger from "./middlewares/logger.js";
 import userRoute from "./routes/user.route.js";
-import bodyParser from "body-parser";
+// import bodyParser from "body-parser";
 import { protect } from "./middlewares/authMiddleware.js";
 import verificationRouter from "./routes/verification.route.js";
 import messageRouter from "./routes/message.route.js";
@@ -23,7 +23,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
 app.use(logger);
 
 app.get("/", (req, res) => {

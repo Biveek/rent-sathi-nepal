@@ -1,16 +1,19 @@
+import jwt from "jsonwebtoken";
+import config from "../config/config.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import uploadImage from "../utils/cloudinaryUpload.js";
+import cloudinary from "../config/cloudinary.js";
 
 const generateToken = (userId) => {
-  const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: "7d",
+  const token = jwt.sign({ id: userId }, config.jwt.secret, {
+    expiresIn: config.jwt.expiresIn,
   });
   return token;
 };
 export const register = async (req, res) => {
   try {
-    const { name, email, phone, password,role } = req.body;
+    const { name, email, phone, password, role } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Please fill all fields" });
     }
@@ -27,7 +30,7 @@ export const register = async (req, res) => {
       email,
       password: hashedPassword,
       phone,
-      role
+      role,
     });
 
     res.status(201).json({
@@ -56,15 +59,13 @@ export const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
-    res
-      .status(200)
-      .json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token: generateToken(user._id),
-      });
+    res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user._id),
+    });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -75,25 +76,57 @@ export const login = async (req, res) => {
 export const getMe = async (req, res) => {
   try {
     // const user = await User.findById(req.params.id)
-    res.json(req.user)
+    res.json(req.user);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
 
 //update my profile
+
 export const updateMe = async (req, res) => {
   try {
     const { name, phone } = req.body;
 
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { name, phone },
-      { new: true }
-    ).select("-password");
+    const user = await User.findById(req.user._id).select("-password");
 
-    res.json({ success: true, data: user });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Update profile information
+    if (name) user.name = name;
+    if (phone) user.phone = phone;
+
+    // Upload new profile photo
+    if (req.file) {
+      // Delete previous image if it exists
+      if (user.profile_photo?.public_id) {
+        await cloudinary.uploader.destroy(user.profile_photo.public_id);
+      }
+
+      const result = await uploadImage(req.file, "profiles");
+
+      user.profile_photo = {
+        url: result.secure_url,
+        public_id: result.public_id,
+      };
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: user,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
