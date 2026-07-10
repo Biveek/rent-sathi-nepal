@@ -29,6 +29,24 @@ export const loginSchema = z.object({
     .min(1, "Password is required"),
 });
 
+const roomDetailsSchema = z.object({
+  bedrooms: z.coerce.number().min(1, "Bedrooms must be at least 1"),
+  bathrooms: z.coerce.number().min(1, "Bathrooms must be at least 1"),
+  wifi: z.coerce.boolean(),
+});
+
+const vehicleDetailsSchema = z.object({
+  brand: z.string().min(1, "Brand is required"),
+  model: z.string().min(1, "Model is required"),
+  fuelType: z.string().min(1, "Fuel type is required"),
+  seats: z.coerce.number().min(1, "Seats must be at least 1"),
+});
+
+const landDetailsSchema = z.object({
+  landArea: z.string().min(1, "Land area is required"),
+  roadAccess: z.coerce.boolean(),
+});
+
 export const listingSchema = z.object({
   title: z
     .string({ required_error: "Title is required" })
@@ -40,14 +58,14 @@ export const listingSchema = z.object({
     .min(20, "Description must be at least 20 characters "),
 
   category: z
-    .enum(["room", "vehicle", "service"], {
+    .enum(["room", "vehicle", "land"], {
       errorMap: () => ({
-        message: "Category must be room, vehicle or service",
+        message: "Category must be room, vehicle or land",
       }),
     })
     .optional(),
 
-  price: z
+  price: z.coerce
     .number({
       required_error: "Price must be included",
       invalid_type_error: "Price must be a number",
@@ -63,6 +81,11 @@ export const listingSchema = z.object({
     .string({ required_error: "City is required" })
     .min(2, "Enter a valid city"),
   area: z.string().optional(),
+  roomDetails: roomDetailsSchema.optional(),
+
+vehicleDetails: vehicleDetailsSchema.optional(),
+
+landDetails: landDetailsSchema.optional(),
 });
 
 export const createBookingSchema = z
