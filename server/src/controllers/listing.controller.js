@@ -124,8 +124,7 @@ const createListing = async (req, res) => {
         public_id: result.public_id,
       });
     }
-    console.log(req.body);
-    console.log(req.body.roomDetails);
+
     const listing = await Listing.create({
       owner_id: req.user._id, // comes from auth middleware
       title,
@@ -140,6 +139,8 @@ const createListing = async (req, res) => {
       ...(category === "vehicle" && { vehicleDetails }),
       ...(category === "land" && { landDetails }),
     });
+    
+    console.log(listing);
 
     res.status(201).json(listing);
   } catch (err) {

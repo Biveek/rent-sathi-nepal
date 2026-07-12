@@ -17,7 +17,7 @@ const listingSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ["room", "vehicle", "service"],
+      enum: ["room", "vehicle", "land"],
       required: [true, "Category is required"],
     },
     price: {
