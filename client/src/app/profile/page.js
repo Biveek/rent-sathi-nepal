@@ -59,6 +59,33 @@ const ProfilePage = () => {
     }
   }
 
+  async function handlePhotoChange(e) {
+  const file = e.target.files[0];
+
+  if (!file) return;
+
+  try {
+    const data = new FormData();
+    data.append("profile_photo", file);
+
+    const response = await api.put("/auth/me", data);
+
+    const updatedUser = response.data.data;
+
+    setUser(updatedUser);
+
+    localStorage.setItem(
+      "rentsathi_user",
+      JSON.stringify({
+        ...JSON.parse(localStorage.getItem("rentsathi_user")),
+        ...updatedUser,
+      })
+    );
+  } catch (error) {
+    console.error(error);
+  }
+}
+
   // Loading state
   if (loading) {
     return (
@@ -97,7 +124,7 @@ const ProfilePage = () => {
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={(e) => console.log(e.target.files[0])} // connect to Cloudinary later
+                  onChange={handlePhotoChange} // connect to Cloudinary later
                 />
               </label>
 

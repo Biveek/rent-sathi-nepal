@@ -16,6 +16,25 @@ const CreateListingPage = () => {
     city: "",
     area: "",
   });
+  const [images, setImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [roomDetails, setRoomDetails] = useState({
+    bedrooms: "",
+    bathrooms: "",
+    wifi: false,
+  });
+
+  const [vehicleDetails, setVehicleDetails] = useState({
+    brand: "",
+    model: "",
+    fuelType: "",
+    seats: "",
+  });
+
+  const [landDetails, setLandDetails] = useState({
+    landArea: "",
+    roadAccess: false,
+  });
 
   // Protect route — only owners/admins can access
   useEffect(() => {
@@ -30,8 +49,60 @@ const CreateListingPage = () => {
     }
   }, []);
 
+  useEffect(() => {
+    return () => {
+      images.forEach((image) => {
+        URL.revokeObjectURL(image.preview);
+      });
+    };
+  }, [images]);
+
   function handleChange(e) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  }
+  function handleImageChange(e) {
+    const files = Array.from(e.target.files);
+
+    const newImages = files.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+
+    setImages((prev) => [...prev, ...newImages]);
+
+    e.target.value = "";
+  }
+  function removeImage(index) {
+    URL.revokeObjectURL(images[index].preview);
+
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function handleRoomChange(e) {
+    const { name, value, type, checked } = e.target;
+
+    setRoomDetails((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  }
+
+  function handleVehicleChange(e) {
+    const { name, value } = e.target;
+
+    setVehicleDetails((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+
+  function handleLandChange(e) {
+    const { name, type, value, checked } = e.target;
+
+    setLandDetails((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   }
 
   async function handleSubmit(e) {
@@ -40,11 +111,38 @@ const CreateListingPage = () => {
     setError("");
 
     try {
-      await api.post("/listings", {
-        ...formData,
-        price: Number(formData.price),
+      const data = new FormData();
+
+      // Common fields
+      data.append("title", formData.title);
+      data.append("description", formData.description);
+      data.append("category", formData.category);
+      data.append("price", Number(formData.price));
+      data.append("price_unit", formData.price_unit);
+      data.append("city", formData.city);
+      data.append("area", formData.area);
+
+      // Category-specific details
+      if (formData.category === "room") {
+        data.append("roomDetails", JSON.stringify(roomDetails));
+      }
+
+      if (formData.category === "vehicle") {
+        data.append("vehicleDetails", JSON.stringify(vehicleDetails));
+      }
+
+      if (formData.category === "land") {
+        data.append("landDetails", JSON.stringify(landDetails));
+      }
+
+      // Images
+      images.forEach((image) => {
+        data.append("images", image.file);
       });
-      router.push("/"); // redirect to home after creating
+
+      await api.post("/listings", data);
+
+      router.push("/");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to create listing.");
     } finally {
@@ -57,7 +155,6 @@ const CreateListingPage = () => {
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto">
         <div className="w-full bg-white rounded-lg shadow dark:border sm:max-w-lg md:max-w-xl dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-
             <h1 className="text-xl font-bold text-gray-900 md:text-2xl dark:text-white">
               Add New Listing
             </h1>
@@ -70,7 +167,6 @@ const CreateListingPage = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-
               {/* Title */}
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -118,7 +214,7 @@ const CreateListingPage = () => {
                   <option value="">Select category</option>
                   <option value="room">Room</option>
                   <option value="vehicle">Vehicle</option>
-                  <option value="service">Service</option>
+                  <option value="land">Land</option>
                 </select>
               </div>
 
@@ -190,6 +286,210 @@ const CreateListingPage = () => {
                 </div>
               </div>
 
+              {formData.category === "room" && (
+                <div className="space-y-4 border rounded-lg p-4">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Room Details
+                  </h2>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Bedrooms */}
+                    <div>
+                      <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Bedrooms
+                      </label>
+                      <input
+                        type="number"
+                        name="bedrooms"
+                        value={roomDetails.bedrooms}
+                        onChange={handleRoomChange}
+                        min={1}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </div>
+
+                    {/* Bathrooms */}
+                    <div>
+                      <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Bathrooms
+                      </label>
+                      <input
+                        type="number"
+                        name="bathrooms"
+                        value={roomDetails.bathrooms}
+                        onChange={handleRoomChange}
+                        min={1}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </div>
+                  </div>
+
+                  {/* WiFi */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="wifi"
+                      name="wifi"
+                      checked={roomDetails.wifi}
+                      onChange={handleRoomChange}
+                      className="w-4 h-4"
+                    />
+
+                    <label
+                      htmlFor="wifi"
+                      className="text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      WiFi Available
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {formData.category === "vehicle" && (
+                <div className="space-y-4 border rounded-lg p-4">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Vehicle Details
+                  </h2>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Brand
+                      </label>
+                      <input
+                        type="text"
+                        name="brand"
+                        value={vehicleDetails.brand}
+                        onChange={handleVehicleChange}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Model
+                      </label>
+                      <input
+                        type="text"
+                        name="model"
+                        value={vehicleDetails.model}
+                        onChange={handleVehicleChange}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Fuel Type
+                      </label>
+                      <input
+                        type="text"
+                        name="fuelType"
+                        value={vehicleDetails.fuelType}
+                        onChange={handleVehicleChange}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Seats
+                      </label>
+                      <input
+                        type="number"
+                        name="seats"
+                        min={1}
+                        value={vehicleDetails.seats}
+                        onChange={handleVehicleChange}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {formData.category === "land" && (
+                <div className="space-y-4 border rounded-lg p-4">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Land Details
+                  </h2>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      Land Area
+                    </label>
+                    <input
+                      type="text"
+                      name="landArea"
+                      value={landDetails.landArea}
+                      onChange={handleLandChange}
+                      placeholder="e.g. 10 Aana"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="roadAccess"
+                      name="roadAccess"
+                      checked={landDetails.roadAccess}
+                      onChange={handleLandChange}
+                    />
+
+                    <label
+                      htmlFor="roadAccess"
+                      className="text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Road Access Available
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {/* Images selection */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Listing Images
+                </label>
+
+                <input
+                  type="file"
+                  name="images"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600"
+                />
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                  {images.map((image, index) => (
+                    <div
+                      key={index}
+                      className="relative rounded-lg overflow-hidden border"
+                    >
+                      <img
+                        src={image.preview}
+                        alt="Preview"
+                        className="w-full h-32 object-cover"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-6 h-6"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="mt-2 text-sm text-gray-500">
+                  Select one or more images.
+                </p>
+              </div>
+
               {/* Submit Button */}
               <button
                 type="submit"
@@ -198,7 +498,6 @@ const CreateListingPage = () => {
               >
                 {loading ? "Creating..." : "Create Listing"}
               </button>
-
             </form>
           </div>
         </div>
