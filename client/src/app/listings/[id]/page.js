@@ -1,30 +1,23 @@
-import CardHouse from "@/components/CardHouse";
-import ProductDetail from "@/components/ProductDetail";
-import ProductInfo from "@/components/ProductInfo";
-import React from "react";
+"use client";
 
-const page = () => {
+import { use } from "react";
+import useListing from "@/hooks/useListing";
+import ListingDetails from "@/components/listings/ListingDetails";
+
+export default function ListingPage({ params }) {
+  const { id } = use(params);
+
+  const { listing, loading } = useListing(id);
+
+  if (loading) {
+    return <h1 className="p-10">Loading...</h1>;
+  }
+
+  if (!listing) {
+    return <h1 className="p-10">Listing not found.</h1>;
+  }
+
   return (
-    <>
-      <div className="flex flex-wrap items-center justify-center">
-        <div className="w-3/4 md:w-1/2">
-          <ProductInfo />
-        </div>
-
-        <div className="w-full md:w-1/2">
-          <ProductDetail />
-        </div>
-      </div>
-
-      <div className="grid items-center justify-center grid-cols-1 [@media(max-width:600px)]:grid-cols-[300px] [@media(min-width:601px)]:grid-cols-[repeat(auto-fit,minmax(270px,1fr))] gap-3">
-        <CardHouse />
-        <CardHouse />
-        <CardHouse />
-        <CardHouse />
-        <CardHouse />
-      </div>
-    </>
+  <ListingDetails listing={listing} loading={loading} />
   );
-};
-
-export default page;
+}
