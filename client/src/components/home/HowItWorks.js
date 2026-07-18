@@ -32,7 +32,7 @@ export default function HowItWorks() {
 
         <div className="mb-12 text-center">
           <h2 className="text-3xl font-bold">
-            How RentSathi Works
+            How RentSathi Nepal Works
           </h2>
 
           <p className="mt-3 text-gray-600">

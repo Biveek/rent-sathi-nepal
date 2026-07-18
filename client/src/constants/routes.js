@@ -3,7 +3,8 @@ import {
   Home,
   Bed,
   Car,
- Trees,
+  Trees,
+  House,
   Phone,
   User,
   CalendarDays,
@@ -19,7 +20,7 @@ export const CONTACT_ROUTE = "/contact";
 // Authentication
 export const LOGIN_ROUTE = "/login";
 export const REGISTER_ROUTE = "/register";
-export const VERIFICATION_ROUTE ="/verify";
+export const VERIFICATION_ROUTE = "/verify";
 
 // Listings
 export const LISTINGS_ROUTE = "/listings";
@@ -28,7 +29,7 @@ export const VEHICLES_ROUTE = "/listings/category/vehicle";
 export const LAND_ROUTE = "/listings/category/land";
 
 export const CREATE_LISTING_ROUTE = "/listings/create";
-export const MY_LISTINGS_ROUTE ="/listings/my";
+export const MY_LISTINGS_ROUTE = "/listings/my";
 export const BOOKINGS_ROUTE = "/booking";
 
 // Admin
@@ -66,18 +67,65 @@ export const NAV_MENU = [
 ];
 
 export const USER_MENU = [
-  { label: "Profile", href: PROFILE_ROUTE, icon: User, },
-  { label: "My Bookings", href: BOOKINGS_ROUTE, icon: CalendarDays, },
+  {
+    label: "My Profile",
+    href: PROFILE_ROUTE,
+    icon: User,
+  },
+  {
+    label: "My Bookings",
+    href: BOOKINGS_ROUTE,
+    icon: CalendarDays,
+  },
 ];
 
 export const OWNER_MENU = [
-  { label: "Profile", href: PROFILE_ROUTE, icon: User, },
-  { label: "My Listings", href: MY_LISTINGS_ROUTE },
-  { label: "My Bookings", href: BOOKINGS_ROUTE, icon: CalendarDays },
-  { label: "Verification", href: VERIFICATION_ROUTE, icon: BadgeCheck, },
+  {
+    label: "My Profile",
+    href: PROFILE_ROUTE,
+    icon: User,
+  },
+  {
+    label: "My Listings",
+    href: MY_LISTINGS_ROUTE,
+    icon: House,
+  },
+  {
+    label: "My Bookings",
+    href: BOOKINGS_ROUTE,
+    icon: CalendarDays,
+  },
+  {
+    label: "Verification",
+    href: VERIFICATION_ROUTE,
+    icon: BadgeCheck,
+  },
 ];
 
 export const ADMIN_MENU = [
-  { label: "Dashboard", href: ADMIN_ROUTE, icon: LayoutDashboard,},
-  { label: "Profile", href: PROFILE_ROUTE, icon: User, },
+  {
+    label: "Dashboard",
+    href: ADMIN_ROUTE,
+    icon: LayoutDashboard,
+  },
+  {
+    label: "My Profile",
+    href: PROFILE_ROUTE,
+    icon: User,
+  },
+  {
+    label: "My Listings",
+    href: MY_LISTINGS_ROUTE,
+    icon: House,
+  },
+  {
+    label: "My Bookings",
+    href: BOOKINGS_ROUTE,
+    icon: CalendarDays,
+  },
+  {
+    label: "Verification",
+    href: VERIFICATION_ROUTE,
+    icon: BadgeCheck,
+  },
 ];

@@ -19,7 +19,7 @@ export default function CTASection() {
 
         <p className="mt-5 max-w-2xl text-lg text-violet-100">
           Browse verified rooms, vehicles, and land listings across Nepal
-          or join RentSathi today and publish your own listing.
+          or join RentSathi Nepal today and publish your own listing.
         </p>
 
         <div className="mt-10 flex flex-col gap-4 sm:flex-row">

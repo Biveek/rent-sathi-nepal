@@ -39,7 +39,7 @@ export default function WhyChooseUs() {
 
         <div className="mb-12 text-center">
           <h2 className="text-3xl font-bold">
-            Why Choose RentSathi?
+            Why Choose RentSathi Nepal?
           </h2>
 
           <p className="mt-3 text-gray-600">

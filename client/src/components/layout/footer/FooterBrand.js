@@ -2,11 +2,12 @@ import Link from "next/link";
 
 import { HOME_ROUTE } from "@/constants/routes";
 
+
 export default function FooterBrand() {
   return (
     <div>
       <Link href={HOME_ROUTE} className="text-2xl font-bold text-white">
-        RentSathi
+        RentSathi Nepal
       </Link>
 
       <p className="mt-4 text-sm leading-7 text-gray-400">
