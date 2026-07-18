@@ -1,60 +1,98 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+
 import { login as loginApi, signup as signupApi } from "@/api/auth";
+
+const USER_STORAGE_KEY = "rentsathi_user";
 
 const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const storedUser = localStorage.getItem("rentsathi_user");
-    if (storedUser) {
-      try {
+    try {
+      const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+
+      if (storedUser) {
         setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error("Failed to parse stored user", error);
-        localStorage.removeItem("rentsathi_user");
       }
+    } catch (error) {
+      console.error("Failed to restore user session:", error);
+      localStorage.removeItem(USER_STORAGE_KEY);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
-  const login = async (data) => {
-    const authUser = await loginApi(data);
+  const login = async (credentials) => {
+    const authUser = await loginApi(credentials);
+
     setUser(authUser);
-    localStorage.setItem("rentsathi_user", JSON.stringify(authUser));
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        USER_STORAGE_KEY,
+        JSON.stringify(authUser)
+      );
+    }
+
     return authUser;
   };
 
-  const signup = async (data) => {
-    const authUser = await signupApi(data);
+  const signup = async (userData) => {
+    const authUser = await signupApi(userData);
+
     setUser(authUser);
-    localStorage.setItem("rentsathi_user", JSON.stringify(authUser));
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        USER_STORAGE_KEY,
+        JSON.stringify(authUser)
+      );
+    }
+
     return authUser;
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("rentsathi_user");
+
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(USER_STORAGE_KEY);
+    }
   };
 
   const value = useMemo(
-    () => ({ user, loading, login, signup, logout }),
+    () => ({
+      user,
+      loading,
+      login,
+      signup,
+      logout,
+    }),
     [user, loading]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === null) {
-    throw new Error("useAuth must be used within an AuthProvider");
+
+  if (!context) {
+    throw new Error(
+      "useAuth must be used within an AuthProvider"
+    );
   }
+
   return context;
-};
+}

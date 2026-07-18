@@ -1,6 +1,6 @@
 "use client";
 
-import ListingGrid from "./ListingGrid";
+import ListingsGrid from "./ListingsGrid";
 import useCategoryListings from "@/hooks/useCategoryListings";
 
 export default function SimilarListings({ category, currentListingId }) {
@@ -11,7 +11,7 @@ export default function SimilarListings({ category, currentListingId }) {
     .slice(0, 4);
 
   return (
-    <ListingGrid
+    <ListingsGrid
       title="Similar Listings"
       listings={similarListings}
       loading={loading}

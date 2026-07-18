@@ -1,6 +1,6 @@
 import ListingCard from "./ListingCard";
 
-export default function ListingGrid({
+export default function ListingsGrid({
   title,
   listings,
   loading,

@@ -3,8 +3,8 @@
 import { use } from "react";
 import ListingCard from "@/components/listings/ListingCard";
 import useCategoryListings from "@/hooks/useCategoryListings";
-import { getCategoryListings } from "@/api/listing.api";
-import ListingGrid from "@/components/listings/ListingGrid";
+import { getCategoryListings } from "@/api/listings";
+import ListingGrid from "@/components/listings/ListingsGrid";
 import { CATEGORIES } from "@/constants/categories";
 
 export default function CategoryPage({ params }) {

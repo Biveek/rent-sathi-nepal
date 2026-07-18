@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { HOME_ROUTE, LOGIN_ROUTE, navMenu, REGISTER_ROUTE } from "@/constants/routes";
+import { HOME_ROUTE, LOGIN_ROUTE, NAV_MENU, REGISTER_ROUTE } from "@/constants/routes";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import logo from "@/assets/images/logo.png";
@@ -42,14 +42,14 @@ const Navbar = () => {
 
         {/* Nav Menu */}
         <ul className="hidden md:flex items-center gap-5">
-          {navMenu.map((menu) => {
+          {NAV_MENU.map((menu) => {
             const isActive =
-              pathname == menu.route ||
+              pathname == menu.href ||
               (menu.route !== HOME_ROUTE && pathname.startsWith(menu.route));
             return (
-              <li key={menu.route}>
+              <li key={menu.href}>
                 <Link
-                  href={menu.route}
+                  href={menu.href}
                   className={`hover:text-orange-500/80 transition ${isActive ? "text-orange-500" : ""}`}
                 >
                   {menu.label}

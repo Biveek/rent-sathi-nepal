@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import { getCategoryListings } from "@/api/listings";
+import { getListings } from "@/api/listings";
 
-export default function useCategoryListings(category) {
+export default function useListings(params = {}) {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchListings() {
       setLoading(true);
+
       try {
-        const listings = await getCategoryListings(category);
+        const listings = await getListings(params);
         setListings(listings);
       } catch (error) {
         console.error(error);
@@ -19,7 +20,7 @@ export default function useCategoryListings(category) {
     }
 
     fetchListings();
-  }, [category]);
+  }, [JSON.stringify(params)]);
 
   return {
     listings,

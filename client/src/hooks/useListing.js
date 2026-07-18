@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getListingById } from "@/api/listing.api";
+import { getListingById } from "@/api/listings";
 
 export default function useListing(id) {
   const [listing, setListing] = useState(null);
