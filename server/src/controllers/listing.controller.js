@@ -72,6 +72,33 @@ const createDummyListings = async (req, res) => {
   }
 };
 
+const getMyListings = async (req, res) => {
+  try {
+    const listings = await Listing.find({
+      owner_id: req.user._id,
+      status: { $ne: "removed" },
+    }).sort({
+      createdAt: -1,
+    });
+
+    return res.json({
+      success: true,
+      message:
+        listings.length === 0
+          ? "No listings found"
+          : "Listings fetched successfully",
+      data: listings,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
 const getListingById = async (req, res) => {
   try {
     const listing = await Listing.findById(req.params.id).populate(
@@ -88,6 +115,7 @@ const getListingById = async (req, res) => {
     return res.status(400).json({ message: err.message });
   }
 };
+
 const createListing = async (req, res) => {
   try {
     const {
@@ -139,12 +167,100 @@ const createListing = async (req, res) => {
       ...(category === "vehicle" && { vehicleDetails }),
       ...(category === "land" && { landDetails }),
     });
-    
+
     console.log(listing);
 
-    res.status(201).json(listing);
+    res.status(201).json({
+      success: true,
+      message: "Listing created successfully",
+      data: listing,
+    });
   } catch (err) {
     return res.status(400).json({ message: err.message });
+  }
+};
+
+const updateListing = async (req, res) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+
+    if (!listing) {
+      return res.status(404).json({
+        success: false,
+        message: "Listing not found",
+      });
+    }
+
+    // Only owner can update
+    if (listing.owner_id.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Not your listing",
+      });
+    }
+
+    const {
+      title,
+      description,
+      category,
+      price,
+      price_unit,
+      city,
+      area,
+      roomDetails,
+      vehicleDetails,
+      landDetails,
+    } = req.body;
+
+    // Update basic fields
+    listing.title = title;
+    listing.description = description;
+    listing.category = category;
+    listing.price = price;
+    listing.price_unit = price_unit;
+    listing.city = city;
+    listing.area = area;
+
+    // Update category-specific fields
+    listing.roomDetails =
+      category === "room" ? roomDetails : undefined;
+
+    listing.vehicleDetails =
+      category === "vehicle" ? vehicleDetails : undefined;
+
+    listing.landDetails =
+      category === "land" ? landDetails : undefined;
+
+    // Upload new images only if provided
+    if (req.files && req.files.length > 0) {
+      const images = [];
+
+      for (const file of req.files) {
+        const result = await uploadImage(file, "listings");
+
+        images.push({
+          url: result.secure_url,
+          public_id: result.public_id,
+        });
+      }
+
+      listing.images = images;
+    }
+
+    await listing.save();
+
+    return res.json({
+      success: true,
+      message: "Listing updated successfully",
+      data: listing,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
 
@@ -165,7 +281,7 @@ const deleteListing = async (req, res) => {
     await listing.save();
 
     res.json({ message: "Listing removed" });
-  } catch (error) {
+  } catch (err) {
     return res.status(400).json({ message: err.message });
   }
 };
@@ -173,7 +289,9 @@ const deleteListing = async (req, res) => {
 export {
   getListings,
   createDummyListings,
+  getMyListings,
   getListingById,
   createListing,
+  updateListing,
   deleteListing,
 };
