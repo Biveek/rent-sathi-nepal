@@ -1,9 +1,28 @@
-import React from 'react'
+import CategorySection from "@/components/home/CategorySection";
+import CTASection from "@/components/home/CTASection";
+import FeaturedListingsSection from "@/components/home/FeaturedListingsSection";
+import HeroSection from "@/components/home/HeroSection";
+import HowItWorks from "@/components/home/HowItWorks";
+import TestimonialsSection from "@/components/home/TestimonialsSection";
+import WhyChooseUs from "@/components/home/WhyChooseUs";
 
-const HomePage = () => {
+export default function HomePage() {
   return (
-    <div className='mt-4'>HomePage</div>
-  )
-}
+    <>
+      <HeroSection />
 
-export default HomePage;
+      <CategorySection />
+
+      <FeaturedListingsSection />
+
+      <WhyChooseUs />
+
+      <HowItWorks />
+
+      <TestimonialsSection />
+
+      <CTASection />
+
+    </>
+  );
+}

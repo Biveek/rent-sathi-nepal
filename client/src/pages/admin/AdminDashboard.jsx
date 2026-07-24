@@ -16,7 +16,7 @@ export default function AdminDashboard() {
         Admin Dashboard
       </h1>
       <p style={{ color: "#6b6560", marginBottom: "1.5rem" }}>
-        Manage users and owner verification
+        Manage users and owner verifications
       </p>
 
       {/* Tabs */}

@@ -1,24 +1,16 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { login } from "@/api/auth";
 
 const LoginPage = () => {
-  const router = useRouter();
-  const { user, loading, login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  useEffect(() => {
-    if (!loading && user) {
-      router.replace("/");
-    }
-  }, [loading, user, router]);
-
-  const submitForm = async (e) => {
+  async function submitForm(e) {
     e.preventDefault();
 
     if (!email || !password) {
@@ -27,36 +19,47 @@ const LoginPage = () => {
     }
 
     if (!email.includes("@")) {
-      setError("Invalid email");
+      setError("Invalid Email");
       return;
     }
 
     setError("");
-    setSubmitting(true);
+    setLoading(true);
 
     try {
-      await login({ email, password });
+      const res = await login({ email, password });
+
+      // Save token to localStorage
+      if (res.token) {
+        localStorage.setItem(
+          "rentsathi_user",
+          JSON.stringify({
+            _id: res._id,
+            name: res.name,
+            email: res.email,
+            role: res.role,
+            token: res.token,
+          }),
+        );
+      }
+
+      // Redirect to home after login
       router.push("/");
     } catch (err) {
-      setError(err?.response?.data?.message || err.message || "Login failed");
+      setError(err.response?.data?.message || "Login failed. Try again.");
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div>Loading...</div>
-      </div>
-    );
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
         <h1 className="text-3xl font-bold text-center mb-6">Rental Sathi</h1>
+
+        {/* Error Message */}
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
         <form onSubmit={submitForm} noValidate>
           <div className="flex flex-col gap-4">
             <label className="font-medium">Email</label>
@@ -85,10 +88,10 @@ const LoginPage = () => {
 
             <button
               type="submit"
-              disabled={submitting}
+              disabled={loading}
               className="w-full bg-blue-800 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
             >
-              {submitting ? "Logging In..." : "Login"}
+              {loading ? "Logging In..." : "Login"}
             </button>
           </div>
         </form>

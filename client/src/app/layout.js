@@ -1,18 +1,22 @@
-import Navbar from "@/components/Navbar";
-import Providers from "./providers";
+import Navbar from "@/components/layout/navbar/Navbar";
+import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
+import Footer from "@/components/layout/footer/Footer";
 
 const RootLayout = ({ children }) => {
   return (
     <html lang="en">
       <body>
-        <Providers>
+        <AuthProvider>
           <Navbar />
-          {children}
-        </Providers>
+
+          <main>{children}</main>
+
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
 };
- 
+
 export default RootLayout;
