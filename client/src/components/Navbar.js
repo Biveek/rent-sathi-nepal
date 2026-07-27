@@ -15,6 +15,7 @@ const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
+  console.log(user.role)
 
   function handleLogout() {
     logout();
@@ -71,7 +72,7 @@ const Navbar = () => {
                 </Link>
               )}
               {/* Admin panel — admin only */}
-              {(user.role === "admin" || user.role === "SUPER_ADMIN") && (
+              {(user.role === "Admin" || user.role === "SUPER_ADMIN") && (
                 <Link
                   href="/admin"
                   className="bg-gray-800 text-white text-sm hover:bg-gray-700 p-3 rounded-lg"
@@ -79,13 +80,16 @@ const Navbar = () => {
                   🛡 Admin
                 </Link>
               )}
-              {/* My Bookings */}
-              <Link
-                href="/profile/bookings"
-                className="bg-gray-100 text-sm hover:bg-gray-200 p-3 rounded-lg"
-              >
-                📅 Bookings
-              </Link>
+
+              {/* Customer bookings */}
+              {user.role === "CUSTOMER" && (
+                <Link
+                  href="/profile/bookings"
+                  className="bg-gray-100 text-sm hover:bg-gray-200 p-3 rounded-lg"
+                >
+                  📅 Bookings
+                </Link>
+              )}
 
               {/* Profile */}
               <Link
