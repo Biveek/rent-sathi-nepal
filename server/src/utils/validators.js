@@ -1,4 +1,4 @@
-import { date, z } from "zod";
+import { z } from "zod";
 
 export const registerSchema = z.object({
   name: z
@@ -16,7 +16,7 @@ export const registerSchema = z.object({
     .string()
     .regex(/^(98|97)\d{8}$/, "Phone must be valid nepali number")
     .optional(),
-  role: z.enum(["user", "owner", "admin"]).optional(),
+  role: z.enum(["CUSTOMER", "OWNER", "ADMIN"]).optional(),
 });
 
 export const loginSchema = z.object({
@@ -106,12 +106,12 @@ export const createBookingSchema = z
       .max(500, "Message cannot exceed 500 characters")
       .optional(),
   })
-  .refine((date) => new Date(data.start_date) > new Date(data.end_date), {
+  .refine((data) => new Date(data.end_date) > new Date(data.start_date), {
     message: "End date must be after end date",
     path: ["end-date"],
   })
   .refine(
-    (date) => new Date(data.start_date) >= new Date().setHours(0, 0, 0, 0),
+    (data) => new Date(data.start_date) >= new Date().setHours(0, 0, 0, 0),
     {
       message: "Start date cannot be in past",
       path: ["start-date"],

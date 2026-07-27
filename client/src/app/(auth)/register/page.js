@@ -1,13 +1,16 @@
 "use client";
+
 import React, { useState } from "react";
-import { LOGIN_ROUTE } from "@/constants/routes";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { signup } from "@/api/auth";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { LOGIN_ROUTE } from "@/constants/routes";
+import { signup } from "@/api/auth";
+import { useAuth } from "@/context/AuthContext";
 
 const RegisterPage = () => {
   const { register, handleSubmit } = useForm();
+  const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -15,33 +18,25 @@ const RegisterPage = () => {
   async function SubmitForm(data) {
     setLoading(true);
     setError("");
+
     try {
-      const res = await signup({
+      // 1. Register as a default user
+      await signup({
         name: data.name,
         email: data.email,
         phone: data.phone,
         password: data.password,
+        role: "CUSTOMER", // Default backend role
       });
 
-      // Save token if backend returns one on register
-      if (res.token) {
-        localStorage.setItem(
-          "rentsathi_user",
-          JSON.stringify({
-            _id: res._id,
-            name: res.name,
-            email: res.email,
-            role: res.role,
-            token: res.token, // ← token inside the object!
-          }),
-        );
-      }
+      // 2. Automatically log in after registration
+      await login({ email: data.email, password: data.password });
 
-      // Redirect to login after successful register
-      router.push(LOGIN_ROUTE);
+      // 3. Redirect to homepage
+      router.push("/");
     } catch (err) {
       setError(
-        err.response?.data?.message || "Registration failed. Try again.",
+        err.response?.data?.message || err.message || "Registration failed. Try again."
       );
     } finally {
       setLoading(false);
@@ -49,137 +44,111 @@ const RegisterPage = () => {
   }
 
   return (
-    <section className="bg-gray-50 dark:bg-gray-900">
-      <div className="flex flex-col items-center justify-center px-6 py-4 mx-auto md:h-screen lg:py-0">
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold text-gray-900 md:text-2xl dark:text-white">
-              Create an account
-            </h1>
+    <section className="bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center py-8 px-4">
+      <div className="w-full bg-white rounded-2xl shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+        <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+          <h1 className="text-xl font-bold text-gray-900 md:text-2xl dark:text-white text-center">
+            Create an Account
+          </h1>
 
-            {/* Error Message */}
-            {error && (
-              <div className="p-3 text-sm text-red-600 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-300">
-                {error}
-              </div>
-            )}
+          {/* Error Banner */}
+          {error && (
+            <div className="p-3 text-sm text-red-600 bg-red-100 rounded-lg dark:bg-red-900/40 dark:text-red-300">
+              {error}
+            </div>
+          )}
 
-            <form
-              onSubmit={handleSubmit(SubmitForm)}
-              className="space-y-4 md:space-y-6"
-            >
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Your name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="Your name"
-                  required
-                  {...register("name")}
-                />
-              </div>
+          <form onSubmit={handleSubmit(SubmitForm)} className="space-y-4 md:space-y-5">
+            {/* Name */}
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
+                Your Name
+              </label>
+              <input
+                type="text"
+                placeholder="John Doe"
+                required
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                {...register("name", { required: true })}
+              />
+            </div>
 
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Your email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="name@xyz.com"
-                  required
-                  {...register("email")}
-                />
-              </div>
+            {/* Email */}
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
+                Your Email
+              </label>
+              <input
+                type="email"
+                placeholder="name@xyz.com"
+                required
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                {...register("email", { required: true })}
+              />
+            </div>
 
-              <div>
-                <label
-                  htmlFor="phone"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Phone number
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  placeholder="98xxxxxxxx"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required
-                  {...register("phone")}
-                />
-              </div>
+            {/* Phone */}
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                placeholder="98xxxxxxxx"
+                required
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                {...register("phone", { required: true })}
+              />
+            </div>
 
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Password
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required
-                  {...register("password")}
-                />
-              </div>
+            {/* Password */}
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
+                Password
+              </label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                required
+                minLength={6}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                {...register("password", { required: true, minLength: 6 })}
+              />
+            </div>
 
-              <div className="flex items-start">
-                <div className="flex items-center h-5">
-                  <input
-                    id="terms"
-                    type="checkbox"
-                    className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-                    required
-                  />
-                </div>
-                <div className="ml-3 text-sm">
-                  <label
-                    htmlFor="terms"
-                    className="font-light text-gray-500 dark:text-gray-300"
-                  >
-                    I accept the{" "}
-                    <Link
-                      className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                      href="#"
-                    >
-                      Terms and Conditions
-                    </Link>
-                  </label>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="text-white w-full bg-primary-dark hover:bg-primary focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? "Creating account..." : "Create an account"}
-              </button>
-
-              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Already have an account?{" "}
-                <Link
-                  href={LOGIN_ROUTE}
-                  className="font-medium text-primary-dark hover:underline dark:text-primary-500"
-                >
-                  Login here
+            {/* Terms and Conditions */}
+            <div className="flex items-start">
+              <input
+                id="terms"
+                type="checkbox"
+                required
+                className="w-4 h-4 border border-gray-300 rounded bg-gray-50 mt-0.5"
+                {...register("terms", { required: true })}
+              />
+              <label htmlFor="terms" className="ml-3 text-sm font-light text-gray-500 dark:text-gray-300">
+                I accept the{" "}
+                <Link href="#" className="font-medium text-violet-600 hover:underline dark:text-violet-400">
+                  Terms and Conditions
                 </Link>
-              </p>
-            </form>
-          </div>
+              </label>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="text-white w-full bg-violet-600 hover:bg-violet-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:opacity-50 transition"
+            >
+              {loading ? "Creating account..." : "Create an Account"}
+            </button>
+
+            <p className="text-sm font-light text-gray-500 dark:text-gray-400 text-center">
+              Already have an account?{" "}
+              <Link href={LOGIN_ROUTE} className="font-medium text-violet-600 hover:underline dark:text-violet-400">
+                Login here
+              </Link>
+            </p>
+          </form>
         </div>
       </div>
     </section>

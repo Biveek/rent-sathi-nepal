@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { login } from "@/api/auth";
+import { useAuth } from "@/context/AuthContext";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -9,6 +9,7 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
   async function submitForm(e) {
     e.preventDefault();
@@ -27,22 +28,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const res = await login({ email, password });
-
-      // Save token to localStorage
-      if (res.token) {
-        localStorage.setItem(
-          "rentsathi_user",
-          JSON.stringify({
-            _id: res._id,
-            name: res.name,
-            email: res.email,
-            role: res.role,
-            token: res.token,
-          }),
-        );
-      }
-
+      await login({ email, password });
       // Redirect to home after login
       router.push("/");
     } catch (err) {

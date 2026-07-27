@@ -1,33 +1,29 @@
 "use client";
 import Image from "next/image";
-import { HOME_ROUTE, LOGIN_ROUTE, NAV_MENU, REGISTER_ROUTE } from "@/constants/routes";
+import {
+  HOME_ROUTE,
+  LOGIN_ROUTE,
+  NAV_MENU,
+  REGISTER_ROUTE,
+} from "@/constants/routes";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import logo from "@/assets/images/logo.png";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedUser = JSON.parse(localStorage.getItem("rentsathi_user") || "null");
-      setUser(storedUser);
-    }
-  }, []);
+  const { user, logout } = useAuth();
 
   function handleLogout() {
-    localStorage.removeItem("rentsathi_user");
-    setUser(null);
+    logout();
     router.push(LOGIN_ROUTE);
   }
 
   return (
     <header>
       <nav className="flex flex-wrap sticky w-full items-center justify-between mx-auto px-4 z-20 shadow-md">
-
         {/* Logo */}
         <Link href={HOME_ROUTE} className="flex items-center gap-2">
           <Image
@@ -61,11 +57,12 @@ const Navbar = () => {
 
         {/* Right Side Buttons */}
         <div className="flex gap-2 mx-1 items-center">
-
           {user ? (
             <>
               {/* Add Listing — only for owner or admin */}
-              {(user.role === "owner" || user.role === "admin") && (
+              {(user.role === "OWNER" ||
+                user.role === "ADMIN" ||
+                user.role === "SUPER_ADMIN") && (
                 <Link
                   href="/listings/create"
                   className="bg-violet-600 text-white text-sm hover:bg-violet-500 p-3 rounded-lg"
@@ -73,6 +70,22 @@ const Navbar = () => {
                   + Add Listing
                 </Link>
               )}
+              {/* Admin panel — admin only */}
+              {(user.role === "admin" || user.role === "SUPER_ADMIN") && (
+                <Link
+                  href="/admin"
+                  className="bg-gray-800 text-white text-sm hover:bg-gray-700 p-3 rounded-lg"
+                >
+                  🛡 Admin
+                </Link>
+              )}
+              {/* My Bookings */}
+              <Link
+                href="/profile/bookings"
+                className="bg-gray-100 text-sm hover:bg-gray-200 p-3 rounded-lg"
+              >
+                📅 Bookings
+              </Link>
 
               {/* Profile */}
               <Link
@@ -106,7 +119,6 @@ const Navbar = () => {
               </Link>
             </>
           )}
-
         </div>
       </nav>
     </header>
