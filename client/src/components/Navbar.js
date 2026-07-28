@@ -15,8 +15,7 @@ const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
-  console.log(user.role)
-
+  
   function handleLogout() {
     logout();
     router.push(LOGIN_ROUTE);
@@ -61,9 +60,9 @@ const Navbar = () => {
           {user ? (
             <>
               {/* Add Listing — only for owner or admin */}
-              {(user.role === "OWNER" ||
-                user.role === "ADMIN" ||
-                user.role === "SUPER_ADMIN") && (
+              {(user?.role === "OWNER" ||
+                user?.role === "admin" ||
+                user?.role === "SUPER_ADMIN") && (
                 <Link
                   href="/listings/create"
                   className="bg-violet-600 text-white text-sm hover:bg-violet-500 p-3 rounded-lg"
@@ -72,7 +71,7 @@ const Navbar = () => {
                 </Link>
               )}
               {/* Admin panel — admin only */}
-              {(user.role === "Admin" || user.role === "SUPER_ADMIN") && (
+              {(user.role === "admin" || user.role === "SUPER_ADMIN") && (
                 <Link
                   href="/admin"
                   className="bg-gray-800 text-white text-sm hover:bg-gray-700 p-3 rounded-lg"
@@ -82,7 +81,7 @@ const Navbar = () => {
               )}
 
               {/* Customer bookings */}
-              {user.role === "CUSTOMER" && (
+              {user.role == "CUSTOMER" && (
                 <Link
                   href="/profile/bookings"
                   className="bg-gray-100 text-sm hover:bg-gray-200 p-3 rounded-lg"

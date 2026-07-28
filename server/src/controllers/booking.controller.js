@@ -51,13 +51,15 @@ export const getMyBookings = async (req, res) => {
 
 export const getOwnerBooking = async (req, res) => {
   try {
-    const booking = await Booking.find({ owner_id: req.user._id })
+    const bookings = await Booking.find({ owner_id: req.user._id })
       .populate("listing_id", "title city area price images")
       .populate("user_id", "name phone")
       .sort({ createdAt: -1 });
 
     res.json({ success: true, data: bookings });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 export const updateBookingStatus = async (req,res)=>{

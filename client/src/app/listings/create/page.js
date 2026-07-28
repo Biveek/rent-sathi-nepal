@@ -44,7 +44,7 @@ const CreateListingPage = () => {
       router.push("/login");
       return;
     }
-    if (user.role !== "owner" && user.role !== "admin") {
+    if (user.role !== "OWNER" && user.role !== "admin") {
       router.push("/"); // redirect non-owners to home
     }
   }, []);

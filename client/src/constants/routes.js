@@ -29,7 +29,8 @@ export const LAND_ROUTE = "/listings/category/land";
 
 export const CREATE_LISTING_ROUTE = "/listings/create";
 export const MY_LISTINGS_ROUTE ="/listings/my";
-export const BOOKINGS_ROUTE = "/booking";
+export const BOOKINGS_ROUTE = "/profile/bookings";
+export const OWNER_BOOKINGS_ROUTE = "/profile/owner";
 
 // Admin
 export const ADMIN_ROUTE = "/admin";
@@ -67,13 +68,13 @@ export const NAV_MENU = [
 
 export const USER_MENU = [
   { label: "Profile", href: PROFILE_ROUTE, icon: User, },
-  { label: "My Bookings", href: BOOKINGS_ROUTE, icon: CalendarDays, },
+  { label: "My Bookings", href: "/profile/bookings", icon: CalendarDays, },
 ];
 
 export const OWNER_MENU = [
   { label: "Profile", href: PROFILE_ROUTE, icon: User, },
   { label: "My Listings", href: MY_LISTINGS_ROUTE },
-  { label: "My Bookings", href: BOOKINGS_ROUTE, icon: CalendarDays },
+  { label: "My Bookings", href: "/profile/owner", icon: CalendarDays },
   { label: "Verification", href: VERIFICATION_ROUTE, icon: BadgeCheck, },
 ];
 

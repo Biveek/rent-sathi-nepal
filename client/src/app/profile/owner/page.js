@@ -5,9 +5,13 @@ import { useRouter } from "next/navigation";
 import { getOwnerBookings, updateBookingStatus } from "@/api/booking";
 
 const STATUS_STYLES = {
-  PENDING:   "bg-yellow-100 text-yellow-800",
-  CONFIRMED: "bg-green-100 text-green-700",
-  CANCELED:  "bg-red-100 text-red-600",
+  PENDING:         "bg-yellow-100 text-yellow-800",
+  accepted:        "bg-blue-100 text-blue-700",
+  payment_pending: "bg-orange-100 text-orange-700",
+  confirmed:       "bg-green-100 text-green-700",
+  rejected:        "bg-red-100 text-red-600",
+  CONFIRMED:       "bg-green-100 text-green-700",
+  CANCELED:        "bg-red-100 text-red-600",
 };
 
 export default function OwnerBookingsPage() {
@@ -93,8 +97,8 @@ export default function OwnerBookingsPage() {
                     key={b._id}
                     booking={b}
                     updating={updating}
-                    onAccept={() => handleStatus(b._id, "CONFIRMED")}
-                    onReject={() => handleStatus(b._id, "CANCELED")}
+                    onAccept={() => handleStatus(b._id, "accepted")}
+                    onReject={() => handleStatus(b._id, "rejected")}
                   />
                 ))}
               </div>
